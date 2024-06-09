@@ -8,14 +8,21 @@ public enum Lifetime
     Singleton
 }
 
+
+public record Configurator<T>(T Target, SimpleContainer Container);
+
 public class SimpleContainer
 {
     private readonly Dictionary<Type, (Type, Lifetime)> _typeMapping = new Dictionary<Type, (Type, Lifetime)>();
     private readonly Dictionary<Type, object> _instances = new Dictionary<Type, object>();
+    private readonly Dictionary<Type, object?> _configurations = new Dictionary<Type, object?>();
 
-    public void Register<TInterface, TImplementation>(Lifetime lifetime = Lifetime.Transient)
+    public void Register<TInterface, TImplementation>(
+        Action<Configurator<TImplementation>>? configure = null,
+        Lifetime lifetime = Lifetime.Transient)
     {
         _typeMapping[typeof(TInterface)] = (typeof(TImplementation), lifetime);
+        _configurations[typeof(TImplementation)] = configure;
     }
 
     public TInterface Resolve<TInterface>()
@@ -62,6 +69,43 @@ public class SimpleContainer
             _instances[interfaceType] = implementationInstance;
         }
 
+        if (_configurations.TryGetValue(implementationType, out var configure) &&
+            configure != null)
+        {
+            var configuratorType = typeof(Configurator<>).MakeGenericType(implementationType);
+            var configurator = Activator.CreateInstance(configuratorType, implementationInstance, this);
+            InvokeAction(configure, configurator!);
+        }
+
         return implementationInstance;
+    }
+
+    static void InvokeAction(object actionObj, object parameter)
+    {
+        // Get the action's type (should be something like Action<T>)
+        var actionType = actionObj.GetType();
+
+        // Ensure it's actually an Action<T>
+        if (actionType.IsGenericType && actionType.GetGenericTypeDefinition() == typeof(Action<>))
+        {
+            // Get the type of T
+            var argumentType = actionType.GenericTypeArguments[0];
+
+            // Check if the provided parameter matches T
+            if (parameter.GetType() == argumentType)
+            {
+                // Create a delegate of the correct type and invoke it
+                var action = Delegate.CreateDelegate(actionType, actionObj, "Invoke");
+                action.DynamicInvoke(parameter);
+            }
+            else
+            {
+                throw new InvalidOperationException("Parameter type does not match the Action type parameter");
+            }
+        }
+        else
+        {
+            throw new InvalidOperationException("Provided object is not an Action<T>");
+        }
     }
 }

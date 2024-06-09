@@ -7,6 +7,7 @@ interface IMainService
 
 interface ISubService
 {
+    string Message { get; set; }
     void DoSomething();
 }
 
@@ -28,8 +29,10 @@ class MainService : IMainService
 
 class SubService : ISubService
 {
+    public string Message { get; set; } = "Hello from SubService";
+
     public void DoSomething()
     {
-        Console.WriteLine("SubService is doing something");
+        Console.WriteLine("SubService is doing something. Message is: " + Message);
     }
 }
