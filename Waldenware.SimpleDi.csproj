@@ -6,6 +6,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>preview</LangVersion>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Version>0.0.1</Version>
   </PropertyGroup>
+ 
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\"/>
+    <InternalsVisibleTo Include=" Tests" />
+  </ItemGroup>
 
 </Project>

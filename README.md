@@ -1,0 +1,2 @@
+# SimpleDI
+Dependency injection container

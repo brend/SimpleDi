@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace MyDi;
+namespace SimpleDi;
 
 public enum Lifetime
 {

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>Waldenware.SimpleDi</id>
+    <version>0.0.1</version>
+    <authors>Philipp Brendel</authors>
+    <owners>Philipp Brendel</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A dependency injection container.</description>
+    <releaseNotes>Initial release</releaseNotes>
+  </metadata>
+  <files>
+    <file src="bin\Release\Waldenware.SimpleDi.0.0.1.dll" target="lib\netstandard2.0\" />
+  </files>
+</package>
