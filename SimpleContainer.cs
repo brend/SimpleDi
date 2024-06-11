@@ -2,21 +2,41 @@ using System.Reflection;
 
 namespace SimpleDi;
 
+/// <summary>
+/// Service lifetime
+/// </summary>
 public enum Lifetime
 {
+    /// Transient services are created each time they are requested
     Transient,
+    /// Singleton services are created once and shared
     Singleton
 }
 
-
+/// <summary>
+/// Parameter type for service configuration
+/// </summary>
 public record Configurator<T>(T Target, SimpleContainer Container);
 
+/// <summary>
+///  Simple dependency injection container
+/// </summary>
 public class SimpleContainer
 {
+    /// Mapping service interfaces to implementations and lifetimes
     private readonly Dictionary<Type, (Type, Lifetime)> _typeMapping = new Dictionary<Type, (Type, Lifetime)>();
+    /// Singleton instances
     private readonly Dictionary<Type, object> _instances = new Dictionary<Type, object>();
+    /// Service configurations
     private readonly Dictionary<Type, object?> _configurations = new Dictionary<Type, object?>();
 
+    /// <summary
+    /// Register a service
+    /// </summary>
+    /// <typeparam name="TInterface">Service interface</typeparam>
+    /// <typeparam name="TImplementation">Service implementation</typeparam>
+    /// <param name="configure">Optional configuration action</param>
+    /// <param name="lifetime">Service lifetime</param>
     public void Register<TInterface, TImplementation>(
         Action<Configurator<TImplementation>>? configure = null,
         Lifetime lifetime = Lifetime.Transient)
@@ -25,11 +45,21 @@ public class SimpleContainer
         _configurations[typeof(TImplementation)] = configure;
     }
 
+    /// <summary>
+    /// Resolve a service
+    /// </summary>
+    /// <typeparam name="TInterface">Service interface type</typeparam>
+    /// <returns>Service instance</returns>
     public TInterface Resolve<TInterface>()
     {
         return (TInterface)Resolve(typeof(TInterface));
     }
 
+    /// <summary>
+    /// Resolve a service
+    /// </summary>
+    /// <param name="interfaceType">Service interface type</param>
+    /// <returns>Service instance</returns>
     private object Resolve(Type interfaceType)
     {
         if (_instances.ContainsKey(interfaceType))
